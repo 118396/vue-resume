@@ -1,7 +1,9 @@
-var app = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         editingName: false,
+        loginVisible:false,
+        signUpvisible: false,
         resume: {
             name: '姓名',
             gender: '男',
@@ -18,23 +20,16 @@ var app = new Vue({
         onClickSave(){
             let currentUser = AV.User.current();
             if (!currentUser) {
-                this.showLogin()
+                this.loginVisible = true
             }
             else {
                 this.saveResume()
             }
-            // console.log(this.resume)
-            // //leanCloud 对象保存代码
-            // var User = AV.Object.extend('User')
-            // var user = new User()
-            // user.set('resume','this.resume')
-            // user.save().then(function () {
-            // }, function (error) {
-            // })
-        },
-        saveLogin(){
 
-        },
+        }
+
+        ,
+
         saveResume(){}
     }
 })
