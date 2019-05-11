@@ -29,10 +29,15 @@ let app = new Vue({
         onEdit(key,value){
             this.resume[key] = value
         },
+        hasLogin(){
+            return !!this.currentUser.objectId
+        },
         onLogin(e){
-            AV.User.logIn(this.login.email,this.login.password).then(function (user) {
-                this.currentUser.id = user.id
-                this.currentUser.email = user.attributes.email
+            AV.User.logIn(this.login.email,this.login.password).then((user)=> {
+                user = user.toJSON()
+                this.currentUser.objectId = user.objectId
+                this.currentUser.email = user.email
+                this.loginVisible = false
             },  (error)=> {
                 if(error.code === 211){
                     alert('邮箱不存在')
@@ -57,8 +62,14 @@ let app = new Vue({
             // 设置邮箱
             user.setEmail(this.signUp.email);
             user.signUp().then( (user)=> {
-
+                alert('注册成功')
+                user = user.toJSON()
+                this.currentUser.objectId = user.objectId
+                this.currentUser.email = user.email
+                this.signUpvisible = false
             }, (error)=> {
+                console.dir(error)
+                alert(error.rawMessage)
             })
         },
         onClickSave(){
@@ -71,15 +82,29 @@ let app = new Vue({
 
         },
         saveResume(){
-            let {id} = AV.User.current()
+            let {objectId} = AV.User.current().toJSON()
             // 第一个参数是 className，第二个参数是 objectId
-            let user = AV.Object.createWithoutData('User', id)
+            let user = AV.Object.createWithoutData('User', objectId)
             user.set('resume', this.resume);
-            user.save();
+            user.save().then(()=>{
+                alert('保存成功')
+            },()=>{
+                alert('保存失败')
+            })
+        },
+        getResume(){
+            var query = new AV.Query('User');
+            query.get(this.currentUser.objectId ).then((user)=> {
+                let resume = user.toJSON().resume
+                this.resume = resume
+            }, (error)=> {
+
+            });
         }
     }
 })
 let currentUser = AV.User.current()
 if(currentUser){
-    app.currentUser = currentUser
+    app.currentUser = currentUser.toJSON()
+    app.getResume()
 }
