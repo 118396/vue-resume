@@ -32,13 +32,15 @@
             </ul>
         </div>
         <div class="down">
-            <button class="button" @click="onLogout">登出</button>
+            <button class="button" @click="onLogout" v-show="!!currentUser.id" >登出</button>
         </div>
 
     </aside>
     <main>
         <div class="resume">
+            {{currentUser}}
             <section class="profile">
+
                 <h1>
                     <editable-span :value="resume.name" @edit="onEdit('name',$event)"></editable-span>
                 </h1>
@@ -147,7 +149,7 @@
             </div>
             <div class="actions">
                 <button type="submit">提交</button>
-                <a href="#" @click="signUpvisible = true ,loginVisible = false">注册</a>
+                <a href="#" @click="signUpvisible = true; loginVisible = false">注册</a>
             </div>
         </form>
     </div>
@@ -179,3 +181,4 @@
 <script src="js/app.js"></script>
 </body>
 </html>
+

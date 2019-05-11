@@ -4,6 +4,10 @@ let app = new Vue({
         editingName: false,
         loginVisible:false,
         signUpvisible: false,
+        currentUser:{
+            id: undefined,
+            email: '',
+        },
         resume: {
             name: '姓名',
             gender: '男',
@@ -22,13 +26,14 @@ let app = new Vue({
         }
     },
     methods: {
-        onEdit(key,value) {
+        onEdit(key,value){
             this.resume[key] = value
         },
         onLogin(e){
             AV.User.logIn(this.login.email,this.login.password).then(function (user) {
-                console.log(user);
-            }, function (error) {
+                this.currentUser.id = user.id
+                this.currentUser.email = user.attributes.email
+            },  (error)=> {
                 if(error.code === 211){
                     alert('邮箱不存在')
                 }else if(error.code === 210 ){
@@ -36,10 +41,11 @@ let app = new Vue({
                 }
             });
         },
-        onLogout(){
+        onLogout(e){
             AV.User.logOut();
             alert('注销成功')
-            var currentUser = AV.User.current();
+            window.location.reload()
+            // var currentUser = AV.User.current();
         },
         onSignUp(e){
             // 新建 AVUser 对象实例
@@ -50,28 +56,30 @@ let app = new Vue({
             user.setPassword(this.signUp.password);
             // 设置邮箱
             user.setEmail(this.signUp.email);
-            user.signUp().then(function (user) {
-                console.log(user);
-            }, function (error) {
-            });
+            user.signUp().then( (user)=> {
+
+            }, (error)=> {
+            })
         },
         onClickSave(){
-            let currentUser = AV.User.current();
+            let currentUser = AV.User.current()
             if (!currentUser) {
                 this.loginVisible = true
-            }
-            else {
+            } else {
                 this.saveResume()
             }
 
-        }
-        ,
+        },
         saveResume(){
             let {id} = AV.User.current()
             // 第一个参数是 className，第二个参数是 objectId
-            var user = AV.Object.createWithoutData('User', id);
+            let user = AV.Object.createWithoutData('User', id)
             user.set('resume', this.resume);
             user.save();
         }
     }
 })
+let currentUser = AV.User.current()
+if(currentUser){
+    app.currentUser = currentUser
+}

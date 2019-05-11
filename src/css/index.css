@@ -23,9 +23,11 @@ body {
 button {
     font: inherit;
 }
-div[v-cloak]{
+
+div[v-cloak] {
     display: none;
 }
+
 @media (min-width: 500px) {
     .page {
         height: 100vh;
@@ -54,11 +56,11 @@ div[v-cloak]{
     margin: 20px;
 }
 
-.page > aside .down {
+.page > aside > .down {
     padding: 20px 0;
 }
 
-.page main {
+.page > main {
     flex-grow: 1;
     overflow: auto;
 }
