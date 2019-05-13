@@ -14,7 +14,13 @@ let app = new Vue({
             birthday: '1994-01-01',
             email: 'example@example.com',
             phone: '13811113322',
-            jobTitle: '前端工程师'
+            jobTitle: '前端工程师',
+            skills:[
+                {name:'请填写技能名称' ,description:'请填写技能描述'},
+                {name:'请填写技能名称' ,description:'请填写技能描述'},
+                {name:'请填写技能名称' ,description:'请填写技能描述'},
+                {name:'请填写技能名称' ,description:'请填写技能描述'},
+            ]
         },
         login:{
             email :'',
@@ -27,7 +33,28 @@ let app = new Vue({
     },
     methods: {
         onEdit(key,value){
-            this.resume[key] = value
+                let regex = /\[(\d+)\]/g
+                key = key.replace(regex,(math,number)=> `.${number}`)
+                keys = key.split('.')
+            console.log(keys);
+            console.log(value);
+            let result = this.resume
+            for (let i= 0; i<keys.length; i++){
+                if (i === keys.length -1){
+
+                    console.log(result);
+                    console.log(keys[i]);
+                    console.log(value);
+                    result[keys[i]] = value
+                }  else {
+                    result = result[keys[i]]
+                }
+
+            }
+
+
+
+            result = value
         },
         hasLogin(){
             return !!this.currentUser.objectId
@@ -96,10 +123,19 @@ let app = new Vue({
             var query = new AV.Query('User');
             query.get(this.currentUser.objectId ).then((user)=> {
                 let resume = user.toJSON().resume
-                this.resume = resume
+                Object.assign(this.resume ,resume)
+                //this.resume 的所有可枚举属性，复制到目标对象resume
             }, (error)=> {
 
             });
+        },
+        addSkill(){
+            this.resume.skills.push({
+               name:'请填写技能名称',description:'请填写技能描述'
+            })
+        },
+        removeSkill(index){
+            this.resume.skills.splice(index,1)
         }
     }
 })
