@@ -20,6 +20,10 @@ let app = new Vue({
                 {name:'请填写技能名称' ,description:'请填写技能描述'},
                 {name:'请填写技能名称' ,description:'请填写技能描述'},
                 {name:'请填写技能名称' ,description:'请填写技能描述'},
+            ],
+            projects:[
+                {name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'},
+                {name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'},
             ]
         },
         login:{
@@ -136,7 +140,15 @@ let app = new Vue({
         },
         removeSkill(index){
             this.resume.skills.splice(index,1)
-        }
+        },
+        addProject(){
+            this.resume.projects.push({
+                name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'
+            })
+        },
+        removeProject(index){
+            this.resume.projects.splice(index,1)
+        },
     }
 })
 let currentUser = AV.User.current()
