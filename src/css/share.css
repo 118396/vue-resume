@@ -1,0 +1,19 @@
+.share {
+    position: fixed;
+    min-width: 300px;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    background: #ddd;
+    padding: 30px;
+    box-shadow: 0 0 5px black;
+
+}
+
+.share textarea {
+    word-break: break-all;
+    width: 100%;
+    padding: 5px;
+    height: 5em;
+    resize: none;
+}

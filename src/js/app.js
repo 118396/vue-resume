@@ -2,9 +2,10 @@ let app = new Vue({
     el: '#app',
     data: {
         editingName: false,
-        loginVisible:false,
+        loginVisible: false,
         signUpvisible: false,
-        currentUser:{
+        shareVisible: false,
+        currentUser: {
             id: undefined,
             email: '',
         },
@@ -15,75 +16,69 @@ let app = new Vue({
             email: 'example@example.com',
             phone: '13811113322',
             jobTitle: '前端工程师',
-            skills:[
-                {name:'请填写技能名称' ,description:'请填写技能描述'},
-                {name:'请填写技能名称' ,description:'请填写技能描述'},
-                {name:'请填写技能名称' ,description:'请填写技能描述'},
-                {name:'请填写技能名称' ,description:'请填写技能描述'},
+            skills: [
+                {name: '请填写技能名称', description: '请填写技能描述'},
+                {name: '请填写技能名称', description: '请填写技能描述'},
+                {name: '请填写技能名称', description: '请填写技能描述'},
+                {name: '请填写技能名称', description: '请填写技能描述'},
             ],
-            projects:[
-                {name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'},
-                {name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'},
+            projects: [
+                {name: '请填写项目名称', link: 'http://...', keywords: '请填写关键字', description: '请详细描述'},
+                {name: '请填写项目名称', link: 'http://...', keywords: '请填写关键字', description: '请详细描述'},
             ]
         },
-        login:{
-            email :'',
-            password:''
+        login: {
+            email: '',
+            password: ''
         },
-        signUp:{
-            email :'',
-            password:''
-        }
+        signUp: {
+            email: '',
+            password: ''
+        },
+        shareLink: "不知道"
     },
     methods: {
-        onEdit(key,value){
-                let regex = /\[(\d+)\]/g
-                key = key.replace(regex,(math,number)=> `.${number}`)
-                keys = key.split('.')
-            console.log(keys);
-            console.log(value);
+        onEdit(key, value) {
+            let regex = /\[(\d+)\]/g
+            key = key.replace(regex, (math, number) => `.${number}`)
+            keys = key.split('.')
             let result = this.resume
-            for (let i= 0; i<keys.length; i++){
-                if (i === keys.length -1){
-
-                    console.log(result);
-                    console.log(keys[i]);
-                    console.log(value);
+            for (let i = 0; i < keys.length; i++) {
+                if (i === keys.length - 1) {
                     result[keys[i]] = value
-                }  else {
+                } else {
                     result = result[keys[i]]
                 }
 
             }
 
 
-
             result = value
         },
-        hasLogin(){
+        hasLogin() {
             return !!this.currentUser.objectId
         },
-        onLogin(e){
-            AV.User.logIn(this.login.email,this.login.password).then((user)=> {
+        onLogin(e) {
+            AV.User.logIn(this.login.email, this.login.password).then((user) => {
                 user = user.toJSON()
                 this.currentUser.objectId = user.objectId
                 this.currentUser.email = user.email
                 this.loginVisible = false
-            },  (error)=> {
-                if(error.code === 211){
+            }, (error) => {
+                if (error.code === 211) {
                     alert('邮箱不存在')
-                }else if(error.code === 210 ){
+                } else if (error.code === 210) {
                     alert('邮箱和密码不匹配')
                 }
             });
         },
-        onLogout(e){
-            AV.User.logOut();
+        onLogout(e) {
+            AV.User.logOut()
             alert('注销成功')
             window.location.reload()
             // var currentUser = AV.User.current();
         },
-        onSignUp(e){
+        onSignUp(e) {
             // 新建 AVUser 对象实例
             const user = new AV.User();
             // 设置用户名
@@ -92,18 +87,17 @@ let app = new Vue({
             user.setPassword(this.signUp.password);
             // 设置邮箱
             user.setEmail(this.signUp.email);
-            user.signUp().then( (user)=> {
+            user.signUp().then((user) => {
                 alert('注册成功')
                 user = user.toJSON()
                 this.currentUser.objectId = user.objectId
                 this.currentUser.email = user.email
                 this.signUpvisible = false
-            }, (error)=> {
-                console.dir(error)
+            }, (error) => {
                 alert(error.rawMessage)
             })
         },
-        onClickSave(){
+        onClickSave() {
             let currentUser = AV.User.current()
             if (!currentUser) {
                 this.loginVisible = true
@@ -112,47 +106,48 @@ let app = new Vue({
             }
 
         },
-        saveResume(){
+        saveResume() {
             let {objectId} = AV.User.current().toJSON()
             // 第一个参数是 className，第二个参数是 objectId
             let user = AV.Object.createWithoutData('User', objectId)
             user.set('resume', this.resume);
-            user.save().then(()=>{
+            user.save().then(() => {
                 alert('保存成功')
-            },()=>{
+            }, () => {
                 alert('保存失败')
             })
         },
-        getResume(){
+        getResume() {
             var query = new AV.Query('User');
-            query.get(this.currentUser.objectId ).then((user)=> {
+            query.get(this.currentUser.objectId).then((user) => {
                 let resume = user.toJSON().resume
-                Object.assign(this.resume ,resume)
+                Object.assign(this.resume, resume)
                 //this.resume 的所有可枚举属性，复制到目标对象resume
-            }, (error)=> {
+            }, (error) => {
 
             });
         },
-        addSkill(){
+        addSkill() {
             this.resume.skills.push({
-               name:'请填写技能名称',description:'请填写技能描述'
+                name: '请填写技能名称', description: '请填写技能描述'
             })
         },
-        removeSkill(index){
-            this.resume.skills.splice(index,1)
+        removeSkill(index) {
+            this.resume.skills.splice(index, 1)
         },
-        addProject(){
+        addProject() {
             this.resume.projects.push({
-                name:'请填写项目名称',link:'http://...',keywords:'请填写关键字',description:'请详细描述'
+                name: '请填写项目名称', link: 'http://...', keywords: '请填写关键字', description: '请详细描述'
             })
         },
-        removeProject(index){
-            this.resume.projects.splice(index,1)
+        removeProject(index) {
+            this.resume.projects.splice(index, 1)
         },
     }
 })
 let currentUser = AV.User.current()
-if(currentUser){
+if (currentUser) {
     app.currentUser = currentUser.toJSON()
+    app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId
     app.getResume()
 }

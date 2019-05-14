@@ -11,6 +11,7 @@
     <link href="css/editable-span.css" rel="stylesheet"/>
     <link href="css/login.css" rel="stylesheet"/>
     <link href="css/signUp.css" rel="stylesheet"/>
+    <link href="css/share.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="page" id="app">
@@ -21,7 +22,7 @@
                     <button class="button" @click="onClickSave">保存</button>
                 </li>
                 <li>
-                    <button class="button">分享</button>
+                    <button class="button" @click="shareVisible = true">分享</button>
                 </li>
                 <li>
                     <button class="button">打印</button>
@@ -150,7 +151,12 @@
             </div>
         </form>
     </div>
-
+    <div v-show="shareVisible" class="share" v-cloak readonly>
+        <h3>请将下面链接分享给面试官</h3>
+        <div>
+            <textarea readonly>{{shareLink}}</textarea>
+        </div>
+    </div>
 </div>
 <script src="../vendors/av-min.js"></script>
 <script src="./js/av.js"></script>
