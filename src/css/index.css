@@ -78,4 +78,4 @@ div[v-cloak] {
     padding-right: 2px;
     margin-top: -3px;
 }
-
+::-webkit-scrollbar{display:none;}
