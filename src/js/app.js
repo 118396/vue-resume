@@ -5,7 +5,8 @@ let app = new Vue({
         loginVisible: false,
         signUpVisible: false,
         shareVisible: false,
-        skinPickerVisible:false,
+        shareLink: '',
+        skinPickerVisible: false,
         previewUser: {
             objectId: undefined
         },
@@ -22,9 +23,9 @@ let app = new Vue({
             phone: '13811113322',
             jobTitle: '前端工程师',
             skills: [{
-                    name: '请填写技能名称',
-                    description: '请填写技能描述'
-                },
+                name: '请填写技能名称',
+                description: '请填写技能描述'
+            },
                 {
                     name: '请填写技能名称',
                     description: '请填写技能描述'
@@ -39,11 +40,11 @@ let app = new Vue({
                 },
             ],
             projects: [{
-                    name: '请填写项目名称',
-                    link: 'http://...',
-                    keywords: '请填写关键字',
-                    description: '请详细描述'
-                },
+                name: '请填写项目名称',
+                link: 'http://...',
+                keywords: '请填写关键字',
+                description: '请详细描述'
+            },
                 {
                     name: '请填写项目名称',
                     link: 'http://...',
@@ -52,15 +53,6 @@ let app = new Vue({
                 },
             ]
         },
-        login: {
-            email: '',
-            password: ''
-        },
-        signUp: {
-            email: '',
-            password: ''
-        },
-        shareLink: "不知道",
         mode: 'edit', // 'preview'
     },
     computed: {
@@ -71,11 +63,24 @@ let app = new Vue({
     watch: {
         'currentUser.objectId': function (newValue, oldValue) {
             if (newValue) {
-                this.getResume(this.currentUser)
+                this.getResume(this.currentUser).then((resume) => this.resume = resume)
             }
         }
     },
     methods: {
+        onShare() {
+            if (this.hasLogin()) {
+                this.shareVisible = true
+            } else {
+                alert('请先登录')
+            }
+        },
+        onLogin(user) {
+            this.currentUser.objectId = user.objectId
+            this.currentUser.email = user.email
+            this.getResume(this.currentUser)
+            this.loginVisible = false
+        },
         onEdit(key, value) {
             let regex = /\[(\d+)\]/g
             key = key.replace(regex, (math, number) => `.${number}`)
@@ -92,45 +97,14 @@ let app = new Vue({
         hasLogin() {
             return !!this.currentUser.objectId
         },
-        onLogin(e) {
-            AV.User.logIn(this.login.email, this.login.password).then((user) => {
-                user = user.toJSON()
-                this.currentUser.objectId = user.objectId
-                this.currentUser.email = user.email
-                this.loginVisible = false
-            }, (error) => {
-                if (error.code === 211) {
-                    alert('邮箱不存在')
-                } else if (error.code === 210) {
-                    alert('邮箱和密码不匹配')
-                }
-            });
-        },
+
         onLogout(e) {
             AV.User.logOut()
             alert('注销成功')
             window.location.reload()
             // var currentUser = AV.User.current();
         },
-        onSignUp(e) {
-            // 新建 AVUser 对象实例
-            const user = new AV.User();
-            // 设置用户名
-            user.setUsername(this.signUp.email);
-            // 设置密码
-            user.setPassword(this.signUp.password);
-            // 设置邮箱
-            user.setEmail(this.signUp.email);
-            user.signUp().then((user) => {
-                alert('注册成功')
-                user = user.toJSON()
-                this.currentUser.objectId = user.objectId
-                this.currentUser.email = user.email
-                this.signUpvisible = false
-            }, (error) => {
-                alert(error.rawMessage)
-            })
-        },
+
         onClickSave() {
             let currentUser = AV.User.current()
             if (!currentUser) {
@@ -181,12 +155,10 @@ let app = new Vue({
         removeProject(index) {
             this.resume.projects.splice(index, 1)
         },
-        print(){
+        print() {
             window.print();
         },
-        setTheme(name){
-            document.body.className = name
-        }
+
     }
 })
 
