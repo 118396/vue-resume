@@ -1,70 +1,73 @@
-let app = new Vue({
-    el: '#app',
-    data: {
-        editingName: false,
-        loginVisible: false,
-        signUpVisible: false,
-        shareVisible: false,
-        shareLink: '',
-        skinPickerVisible: false,
-        previewUser: {
-            objectId: undefined
-        },
-        previewResume: {},
-        currentUser: {
-            objectId: undefined,
-            email: '',
-        },
-        resume: {
-            name: '姓名',
-            gender: '男',
-            birthday: '1994-01-01',
-            email: 'example@example.com',
-            phone: '13811113322',
-            jobTitle: '前端工程师',
-            skills: [{
-                name: '请填写技能名称',
-                description: '请填写技能描述'
+window.App = {
+    template: `
+    <div>
+        <app-aside  v-show="mode === 'edit'"  @save="onClickSave"></app-aside>
+        <main>
+            <resume :mode="mode" :display-resume = "displayResume"></resume>
+        </main> 
+        <button class="exitPreview" @click="mode = 'edit'" v-if="mode === 'preview'">退出预览</button>
+    </div>
+    `,
+    data () {
+        return {
+            editingName: false,
+            loginVisible: false,
+            signUpVisible: false,
+            shareVisible: false,
+            shareLink: '',
+            skinPickerVisible: false,
+            previewUser: {
+                objectId: undefined
             },
-                {
-                    name: '请填写技能名称',
-                    description: '请填写技能描述'
-                },
-                {
-                    name: '请填写技能名称',
-                    description: '请填写技能描述'
-                },
-                {
-                    name: '请填写技能名称',
-                    description: '请填写技能描述'
-                },
-            ],
-            projects: [{
-                name: '请填写项目名称',
-                link: 'http://...',
-                keywords: '请填写关键字',
-                description: '请详细描述'
+            previewResume: {},
+            currentUser: {
+                objectId: undefined,
+                email: '',
             },
-                {
-                    name: '请填写项目名称',
-                    link: 'http://...',
-                    keywords: '请填写关键字',
-                    description: '请详细描述'
-                },
-            ]
-        },
-        mode: 'edit', // 'preview'
+            resume: {
+                name: '姓名',
+                gender: '男',
+                birthday: '1994-01-01',
+                email: 'example@example.com',
+                phone: '13811113322',
+                jobTitle: '前端工程师',
+                skills: [{
+                        name: '请填写技能名称',
+                        description: '请填写技能描述'
+                    },
+                    {
+                        name: '请填写技能名称',
+                        description: '请填写技能描述'
+                    },
+                    {
+                        name: '请填写技能名称',
+                        description: '请填写技能描述'
+                    },
+                    {
+                        name: '请填写技能名称',
+                        description: '请填写技能描述'
+                    },
+                ],
+                projects: [{
+                        name: '请填写项目名称',
+                        link: 'http://...',
+                        keywords: '请填写关键字',
+                        description: '请详细描述'
+                    },
+                    {
+                        name: '请填写项目名称',
+                        link: 'http://...',
+                        keywords: '请填写关键字',
+                        description: '请详细描述'
+                    },
+                ]
+            },
+            mode: 'edit', // 'preview'
+        }
     },
     computed: {
         displayResume() {
             return this.mode === 'preview' ? this.previewResume : this.resume
-        }
-    },
-    watch: {
-        'currentUser.objectId': function (newValue, oldValue) {
-            if (newValue) {
-                this.getResume(this.currentUser).then((resume) => this.resume = resume)
-            }
         }
     },
     methods: {
@@ -108,7 +111,7 @@ let app = new Vue({
         onClickSave() {
             let currentUser = AV.User.current()
             if (!currentUser) {
-                this.loginVisible = true
+                this.$router.push('/login')
             } else {
                 this.saveResume()
             }
@@ -135,54 +138,11 @@ let app = new Vue({
 
             });
         },
-        addSkill() {
-            this.resume.skills.push({
-                name: '请填写技能名称',
-                description: '请填写技能描述'
-            })
-        },
-        removeSkill(index) {
-            this.resume.skills.splice(index, 1)
-        },
-        addProject() {
-            this.resume.projects.push({
-                name: '请填写项目名称',
-                link: 'http://...',
-                keywords: '请填写关键字',
-                description: '请详细描述'
-            })
-        },
-        removeProject(index) {
-            this.resume.projects.splice(index, 1)
-        },
         print() {
             window.print();
         },
-
-    }
-})
-
-// 获取当前用户
-let currentUser = AV.User.current()
-if (currentUser) {
-    app.currentUser = currentUser.toJSON()
-    app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId
-    app.getResume(app.currentUser).then(resume => {
-        app.resume = resume
-    })
+    },
+  
 }
 
-//获取预览用户
-let search = location.search
-let regex = /user_id=([^&]+)/
-let matches = search.match(regex)
-let userId
-if (matches) {
-    userId = matches[1]
-    app.mode = 'preview'
-    app.getResume({
-        objectId: userId
-    }).then(resume => {
-        app.previewResume = resume
-    })
-}
+Vue.component('app', App)
